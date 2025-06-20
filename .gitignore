@@ -1,0 +1,29 @@
+# Ambientes virtuais
+venv/
+env/
+.venv/
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Configs do VS Code
+.vscode/
+
+# Arquivos de logs
+*.log
+
+# Testes temporários
+tests/__pycache__/
+
+# Dados gerados
+*.json
+*.csv
