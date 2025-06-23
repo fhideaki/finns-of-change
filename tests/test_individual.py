@@ -13,3 +13,4 @@ def test_gene_reader_characteristics():
 
     assert isinstance(color, str)
     assert isinstance(speed, int)
+    assert indv['gender'] in ['male','female']

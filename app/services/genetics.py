@@ -2,6 +2,7 @@
 import random
 import uuid
 from datetime import datetime
+from app.models.individual import GeneReader
 
 # Classe Nucleo - Armazena e manipula a sequência genética
 class Nucleus():
@@ -19,8 +20,8 @@ class Nucleus():
     def create_dna(self):
         # Método para criar DNA. Deve ser usado somente para a primeira geração de indivíduos.
         self.karyotype = [
-            [x for x in random.choices(self.nucleotides, k=12)]
-            for i in range(4)
+            [x for x in random.choices(self.nucleotides, k=30)]
+            for i in range(6)
         ]
     
     def __get_chromosome_pair(self, karyotype):
@@ -157,6 +158,13 @@ class PopulationManager():
             }
         }
 
+        # Gênero
+        reader = GeneReader(new_individual)
+        codons = reader.get_codons()
+        aminoacids = reader.get_aminoacids(codons)
+        gender = reader.get_gender(aminoacids)
+        new_individual['gender'] = gender
+
         self.population_counter += 1
         self.population.append(new_individual)
         
@@ -172,7 +180,7 @@ class PopulationManager():
         
         # Geração 0
         generation = 0
-        
+
         # Cria o dicionário do novo indivíduo
         new_individual = {
             'indv_id':str(uuid.uuid4()), 
@@ -187,7 +195,14 @@ class PopulationManager():
                 'method':'create_dna'
             }
         }
-        
+
+        # Gênero
+        reader = GeneReader(new_individual)
+        codons = reader.get_codons()
+        aminoacids = reader.get_aminoacids(codons)
+        gender = reader.get_gender(aminoacids)
+        new_individual['gender'] = gender
+
         self.population_counter += 1
         self.population.append(new_individual)
         

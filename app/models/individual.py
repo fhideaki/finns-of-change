@@ -8,6 +8,7 @@ class GeneReader():
         self.karyotype = individual_dictionary['karyotype']
         self.color = None
         self.swimming_speed = 0
+        self.gender = None
     
     def get_codons(self):
         codon_list = []
@@ -49,3 +50,17 @@ class GeneReader():
         self.swimming_speed = 1 * (swim_gene.get('arginine',0) * 5) - swim_gene.get('stop',0)
     
         return self.swimming_speed
+    
+    def get_gender(self, aminoacids, index=5):
+    # Definindo arbitrariamente o gênero do peixe
+        gender_chromosomes = aminoacids[index]
+        gender_gene = {x: gender_chromosomes.count(x) for x in set(gender_chromosomes)}
+        glutamine = gender_gene.get('glutamine',0)
+        
+        if glutamine > 5:
+            self.gender = 'male'
+        else:
+            self.gender = 'female'
+
+        return self.gender
+
