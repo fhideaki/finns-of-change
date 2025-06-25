@@ -57,7 +57,7 @@ class GeneReader():
         gender_gene = {x: gender_chromosomes.count(x) for x in set(gender_chromosomes)}
         glutamine = gender_gene.get('glutamine',0)
         
-        if glutamine > 5:
+        if glutamine > 1:
             self.gender = 'male'
         else:
             self.gender = 'female'
