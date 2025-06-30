@@ -60,7 +60,7 @@ def add_karyotype(indv_id, individual_dict):
     method = individual_dict['metadados']['method']
 
     cursor.execute("""
-        INSERT INTO karyotype (individual_id, karyotype, chromosome_origin, cutting_points, method)
+        INSERT INTO karyotype (id, karyotype, chromosome_origin, cutting_points, method)
         VALUES (?, ?, ?, ?, ?)
                 """,
                 (indv_id, karyotype, chromosome_origin, cutting_points, method))
@@ -80,35 +80,6 @@ def add_full_individual(individual_dict):
 
     return print("Individual added!")
 
-# Buscando um indivíduo com o id específico
-def get_individual_by_id(indv_id):
-    
-    conn = sqlite3.connect('fishes.db')
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT * FROM individuals WHERE id = ?
-        """, (indv_id,))
-    individual = cursor.fetchone()
-
-    cursor.execute("""
-        SELECT * FROM karyotype WHERE individual_id = ?
-        """, (indv_id,))
-    karyo_data = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-
-    if individual and karyo_data:
-        indv_dict = dict(individual)
-        indv_dict['karyotype'] = json.loads(karyo_data['karyotype'])
-        indv_dict['chromosome_origin'] = json.loads(karyo_data['chromosome_origin'])
-        indv_dict['metadados'] = {
-            'cutting_points': json.loads(karyo_data['cutting_points']),
-        #    'method': json.loads(karyo_data(['method']))
-        }
-        return indv_dict
 # Buscando todos os indivíduos da tabela
 def get_all_individuals(population_id=None):
 
@@ -131,3 +102,37 @@ def get_all_individuals(population_id=None):
     conn.close()
 
     return [dict(row) for row in results]
+
+# Buscando um indivíduo com o id específico
+def get_individual_by_id(indv_id):
+    
+    conn = sqlite3.connect('fishes.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT * FROM individuals WHERE id = ?
+        """, (indv_id,))
+    
+    individual = cursor.fetchone()
+    
+    cursor.close()
+    conn.close()
+
+    return dict(individual)
+
+def get_karyotype_by_id(indv_id):
+    
+    conn = sqlite3.connect('fishes.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT * FROM karyotype WHERE id = ?
+        """, (indv_id,))
+    karyo_data = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+    
+    return dict(karyo_data)

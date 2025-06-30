@@ -51,22 +51,34 @@ def get_individual(id):
     return jsonify(result)
 
 # Criando indivíduos a partir de outros (fecundação)
-@api.route('/cross', methods=['POST'])
+@api.route('/cross', methods=['GET','POST'])
 def fertilize():
 
-    pop_mngr = PopulationManager()
+    if request.method == 'GET':
+        return jsonify({"message": "Use POST method with JSON payload"}), 400
+     
+    elif request.method == 'POST':
+        pop_mngr = PopulationManager()
 
-    data = request.get_json()
+        data = request.get_json()
+        data = dict(data)
 
-    father_id = data['father_id']
-    mother_id = data['mother_id']
+        father_id = data['father_id']
+        mother_id = data['mother_id']
 
-    father = get_individual_by_id(father_id)
-    mother = get_individual_by_id(mother_id)
+        father = get_individual_by_id(father_id)
+        father_karyo = get_karyotype_by_id(father_id)
 
-    if father['gender'] == mother['gender']:
-        return jsonify({'error': 'Same gender fertilization is not possible'}), 400
-    
-    child = pop_mngr.fertilization(father, mother)
-    add_full_individual(child)
-    return jsonify(child)
+        father.update(father_karyo)
+
+        mother = get_individual_by_id(mother_id)
+        mother_karyo = get_karyotype_by_id(mother_id)
+        mother.update(mother_karyo)
+
+        if father['gender'] == mother['gender']:
+            return jsonify({'error': 'Same gender fertilization is not possible'}), 400
+        
+        # child = pop_mngr.fertilization(father, mother)
+        # add_full_individual(child)
+        # return jsonify(child)
+        return "Okay"

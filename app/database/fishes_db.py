@@ -32,13 +32,12 @@ CREATE TABLE IF NOT EXISTS individuals (
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS karyotype (
-               id INTEGER PRIMARY KEY AUTOINCREMENT,
-               individual_id TEXT,
+               id TEXT PRIMARY KEY,
                karyotype TEXT,
                chromosome_origin TEXT,
                cutting_points TEXT,
                method TEXT,
-               FOREIGN KEY(individual_id) REFERENCES individuals(id)
+               FOREIGN KEY(id) REFERENCES individuals(id)
                )
 """)
 

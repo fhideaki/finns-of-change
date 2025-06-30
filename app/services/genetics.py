@@ -143,8 +143,8 @@ class PopulationManager():
         # Retorna um dicionário com as informações do novo indivíduo
         new_individual = {
             'indv_id':str(uuid.uuid4()), 
-            'father_id':father['indv_id'],
-            'mother_id':mother['indv_id'],
+            'father_id':father['id'],
+            'mother_id':mother['id'],
             'generation':generation,
             'karyotype':karyotype,
             'chromosome_origin':{'father_gamete':fat_gamete['origin'],'mother_gamete':mot_gamete['origin']},
@@ -167,9 +167,11 @@ class PopulationManager():
 
         self.population_counter += 1
         self.population.append(new_individual)
-        
-        return new_individual
-        
+
+        print("Tipo dos cromossomos no gameta pai:", type(fat_gamete['chromosomes'][0]))
+        print("Tipo dos cromossomos no gameta mãe:", type(mot_gamete['chromosomes'][0]))
+        print("Primeiro cromossomo pai:", fat_gamete['chromosomes'][0])
+        print("Primeiro cromossomo mãe:", mot_gamete['chromosomes'][0])
         
     # Método para criar indivíduos que não vão ter pais
     def create_individual(self):
@@ -205,5 +207,3 @@ class PopulationManager():
 
         self.population_counter += 1
         self.population.append(new_individual)
-        
-        return new_individual

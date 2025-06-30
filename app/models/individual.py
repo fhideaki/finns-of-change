@@ -1,7 +1,7 @@
 
 from app.utils.support import inverted_aminoacid_table
 
-# Classe indivíduo, que vai receber o DNA e exibir as características de acordo com os genes gerados.
+# Classe GeneReader, que vai receber o DNA e exibir as características de acordo com os genes gerados.
 class GeneReader():
     
     def __init__(self, individual_dictionary):
