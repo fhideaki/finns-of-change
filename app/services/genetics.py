@@ -167,11 +167,9 @@ class PopulationManager():
 
         self.population_counter += 1
         self.population.append(new_individual)
-
-        print("Tipo dos cromossomos no gameta pai:", type(fat_gamete['chromosomes'][0]))
-        print("Tipo dos cromossomos no gameta mãe:", type(mot_gamete['chromosomes'][0]))
-        print("Primeiro cromossomo pai:", fat_gamete['chromosomes'][0])
-        print("Primeiro cromossomo mãe:", mot_gamete['chromosomes'][0])
+        
+        return new_individual
+        
         
     # Método para criar indivíduos que não vão ter pais
     def create_individual(self):
@@ -207,3 +205,4 @@ class PopulationManager():
 
         self.population_counter += 1
         self.population.append(new_individual)
+

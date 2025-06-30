@@ -78,7 +78,7 @@ def fertilize():
         if father['gender'] == mother['gender']:
             return jsonify({'error': 'Same gender fertilization is not possible'}), 400
         
-        # child = pop_mngr.fertilization(father, mother)
+        child = pop_mngr.fertilization(father, mother)
+
         # add_full_individual(child)
-        # return jsonify(child)
-        return "Okay"
+        return jsonify(child)

@@ -130,9 +130,19 @@ def get_karyotype_by_id(indv_id):
     cursor.execute("""
         SELECT * FROM karyotype WHERE id = ?
         """, (indv_id,))
+    
     karyo_data = cursor.fetchone()
+    
+    karyo_dict = {}
+    
+    karyo_dict['id'] = karyo_data['id']
+    karyo_dict['karyotype'] = json.loads(karyo_data['karyotype'])
+    karyo_dict['chromosome_origin'] = json.loads(karyo_data['chromosome_origin'])
+    karyo_dict['cutting_points'] = json.loads(karyo_data['cutting_points'])
+    karyo_dict['method'] = karyo_data['method']
+    
 
     cursor.close()
     conn.close()
     
-    return dict(karyo_data)
+    return karyo_dict
