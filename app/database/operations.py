@@ -146,3 +146,21 @@ def get_karyotype_by_id(indv_id):
     conn.close()
     
     return karyo_dict
+
+# Buscando todas as populações da tabela
+def get_populations():
+
+    conn = sqlite3.connect('fishes.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT * FROM population
+        """)
+        
+    results = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return [dict(row) for row in results]
