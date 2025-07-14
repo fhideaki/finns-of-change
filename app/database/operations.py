@@ -1,6 +1,8 @@
 # Imports
 import sqlite3
 import json
+from app.models.individual import GeneReader
+# import pandas as pd
 
 # Lista das operações do banco de dados
 
@@ -24,7 +26,7 @@ def add_population(name):
     return last_id
     
 # Inserindo um indivíduo na tabela
-def add_individual(individual_dict, population_id=1):
+def add_individual(individual_dict, population_id=None):
 
     conn = sqlite3.connect('fishes.db')
     cursor = conn.cursor()
@@ -36,11 +38,20 @@ def add_individual(individual_dict, population_id=1):
     gender = individual_dict['gender']
     timestamp = individual_dict['timestamp']
 
-    cursor.execute("""
-        INSERT INTO individuals (id, father_id, mother_id, generation, gender, timestamp, population_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-                   """,
-                   (indv_id, father_id, mother_id, generation, gender, timestamp, population_id))
+    if population_id:
+        cursor.execute("""
+            INSERT INTO individuals (id, father_id, mother_id, generation, gender, timestamp, population_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (indv_id, father_id, mother_id, generation, gender, timestamp, population_id))
+    else:
+        population_id = 1
+        cursor.execute("""
+            INSERT INTO individuals (id, father_id, mother_id, generation, gender, timestamp, population_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (indv_id, father_id, mother_id, generation, gender, timestamp, population_id))
+
     conn.commit()
 
     cursor.close()
@@ -147,6 +158,27 @@ def get_karyotype_by_id(indv_id):
     
     return karyo_dict
 
+# Buscando as características individuais e também os genes
+def get_individual_characteristics(id):
+    data = {'indv_id':id}
+    indv_id = data['indv_id']
+    indv = get_individual_by_id(indv_id)
+    indv = dict(indv)
+    indv_karyo = get_karyotype_by_id(indv_id)
+    indv_karyo = dict(indv_karyo)
+    indv.update(indv_karyo)
+    g_reader = GeneReader(indv)
+    codon_list = g_reader.get_codons()
+    aminoacids = g_reader.get_aminoacids(codon_list)
+    color = g_reader.get_color(aminoacids)
+    speed = g_reader.get_swimming_speed(aminoacids)
+    result = {
+        'color':color,
+        'swimming_speed':speed,
+        'genes':aminoacids
+    }
+    return result
+
 # Buscando todas as populações da tabela
 def get_populations():
 
@@ -164,3 +196,52 @@ def get_populations():
     conn.close()
 
     return [dict(row) for row in results]
+
+# Buscando todas as informações para retornar um DataFrame
+def build_statistics_dataframe():
+
+    individuals_dict = get_all_individuals()
+
+    dict_for_dataframe = []
+    
+    for i in individuals_dict:
+        dict(i)
+        id = i['id']
+        karyo = get_karyotype_by_id(id)
+        characteristics = get_individual_characteristics(id)
+        i.update(karyo)
+        i.update(characteristics)
+
+        if i['chromosome_origin'] == None:
+            chromosome_origin_father = None
+            chromosome_origin_mother = None
+            cutting_points_father = None
+            cutting_points_mother = None
+        else:
+            chromosome_origin_father = i['chromosome_origin']['father_gamete']
+            chromosome_origin_mother = i['chromosome_origin']['mother_gamete']
+            cutting_points_father = i['cutting_points']['father']
+            cutting_points_mother = i['cutting_points']['mother']
+
+        individual = {
+            'id': i['id'],
+            'father_id':i['father_id'],
+            'mother_id':i['mother_id'],
+            'generation':i['generation'],
+            'population_id':i['population_id'],
+            'chromosome_origin_father': chromosome_origin_father,
+            'chromosome_origin_mother': chromosome_origin_mother,
+            'cutting_points_father': cutting_points_father,
+            'cutting_points_mother': cutting_points_mother,
+            'gender': i['gender'],
+            'color': i['color'],
+            'swimming_speed': i['swimming_speed'],
+            'method': i['method'],
+            'karyotype_pair_1': i['karyotype'][0:2],
+            'karyotype_pair_2': i['karyotype'][2:4],
+            'karyotype_pair_3': i['karyotype'][4:6],
+            'timestamp':i['timestamp']
+
+        }
+        dict_for_dataframe.append(individual)
+    return dict_for_dataframe

@@ -12,6 +12,12 @@ api = Blueprint('api', __name__)
 def status():
     return 'API Working'
 
+# Criando uma população
+@api.route('/createpopulation/<name>')
+def create_population(name):
+    pop = add_population(name)
+    return f"Population {pop} named {name} created!"
+
 # Criando um indivíduo
 @api.route('/create')
 def create():
@@ -52,23 +58,8 @@ def get_individual(id):
 
 # Buscando as características do indivíduo
 @api.route('/individual/<id>/analysis')
-def get_individual_characteristics(id):
-    data = {'indv_id':id}
-    indv_id = data['indv_id']
-    indv = get_individual_by_id(indv_id)
-    indv = dict(indv)
-    indv_karyo = get_karyotype_by_id(indv_id)
-    indv_karyo = dict(indv_karyo)
-    indv.update(indv_karyo)
-    g_reader = GeneReader(indv)
-    codon_list = g_reader.get_codons()
-    aminoacids = g_reader.get_aminoacids(codon_list)
-    color = g_reader.get_color(aminoacids)
-    speed = g_reader.get_swimming_speed(aminoacids)
-    result = {
-        'color':color,
-        'swimming_speed':speed
-    }
+def get_analysis(id):
+    result = get_individual_characteristics(id)
     return result
 
 # Criando indivíduos a partir de outros (fecundação)
@@ -101,7 +92,7 @@ def fertilize():
         
         child = pop_mngr.fertilization(father, mother)
 
-        # add_full_individual(child)
+        add_full_individual(child)
         return jsonify(child)
 
 # Criando populações
@@ -120,13 +111,9 @@ def population_route():
         population = add_population(name)
         return jsonify(population)
 
-# Criando rota para buscar as estatísticas de todas os indivíduos de todas as populações
 @api.route('/statistics')
-def get_all_statistics():
-    population_id = request.args.get('population_id')
+def get_statistics_dataframe():
 
-    if population_id:
-        stats = {
-            'population_id':population_id,
-            'total_individuals':
-        }
+    indviduals_dict = build_statistics_dataframe()
+
+    return jsonify(indviduals_dict)

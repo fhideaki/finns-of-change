@@ -206,3 +206,5 @@ class PopulationManager():
         self.population_counter += 1
         self.population.append(new_individual)
 
+        return new_individual
+
