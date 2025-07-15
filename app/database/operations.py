@@ -2,6 +2,7 @@
 import sqlite3
 import json
 from app.models.individual import GeneReader
+from flask import jsonify
 # import pandas as pd
 
 # Lista das operações do banco de dados
@@ -245,3 +246,54 @@ def build_statistics_dataframe():
         }
         dict_for_dataframe.append(individual)
     return dict_for_dataframe
+
+# Deletando um indivíduo da tabela (e também o cariótipo)
+def delete_individual(id):
+    conn = sqlite3.connect('fishes.db')
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        DELETE FROM karyotype WHERE id = ?
+""", (id,))
+    
+    cursor.execute("""
+        DELETE FROM individuals WHERE id = ?
+""", (id,))
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        return jsonify({'message':'Individual not found'}), 404
+    else:
+        return jsonify({'message':'Individual deleted'}), 200
+    
+# Deletando uma população inteira
+def delete_population(population_id):
+    conn = sqlite3.connect('fishes.db')
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        DELETE FROM karyotype 
+        WHERE id IN (
+            SELECT id FROM individuals WHERE population_id = ?
+        )
+""", (population_id,))
+    
+    cursor.execute("""
+        DELETE FROM individuals
+        WHERE population_id = ?
+""", (population_id,))
+    
+    cursor.execute("""
+        DELETE FROM population 
+        WHERE id = ?
+""", (population_id,))
+    
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        return jsonify({'message':'Population not found'}), 404
+    else:
+        return jsonify({'message':'Population deleted'}), 200
+    
+    

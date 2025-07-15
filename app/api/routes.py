@@ -111,9 +111,28 @@ def population_route():
         population = add_population(name)
         return jsonify(population)
 
+# Retornando um JSON com todas as estatísticas dos peixes criados
 @api.route('/statistics')
 def get_statistics_dataframe():
 
     indviduals_dict = build_statistics_dataframe()
 
     return jsonify(indviduals_dict)
+
+# Deletando um indivíduo
+@api.route('/delete/<id>', methods=['DELETE'])
+def delete_individual_route(id):
+    
+    result = delete_individual(id)
+
+    return result
+
+# Deletando uma população
+@api.route('/delete/population/<population_id>', methods=['DELETE'])
+def delete_population_route(population_id):
+
+    population_id = str(population_id)
+    
+    result = delete_population(population_id)
+
+    return result
