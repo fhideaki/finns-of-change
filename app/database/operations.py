@@ -27,7 +27,7 @@ def add_population(name):
     return last_id
     
 # Inserindo um indivíduo na tabela
-def add_individual(individual_dict, population_id=None):
+def add_individual(individual_dict, population_id):
 
     conn = sqlite3.connect('fishes.db')
     cursor = conn.cursor()
@@ -39,19 +39,11 @@ def add_individual(individual_dict, population_id=None):
     gender = individual_dict['gender']
     timestamp = individual_dict['timestamp']
 
-    if population_id:
-        cursor.execute("""
-            INSERT INTO individuals (id, father_id, mother_id, generation, gender, timestamp, population_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (indv_id, father_id, mother_id, generation, gender, timestamp, population_id))
-    else:
-        population_id = 1
-        cursor.execute("""
-            INSERT INTO individuals (id, father_id, mother_id, generation, gender, timestamp, population_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (indv_id, father_id, mother_id, generation, gender, timestamp, population_id))
+    cursor.execute("""
+        INSERT INTO individuals (id, father_id, mother_id, generation, gender, timestamp, population_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (indv_id, father_id, mother_id, generation, gender, timestamp, population_id))
 
     conn.commit()
 

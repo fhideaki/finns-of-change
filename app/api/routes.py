@@ -1,5 +1,5 @@
 # Imports
-from flask import request, jsonify, Blueprint, redirect
+from flask import request, jsonify, Blueprint, redirect, render_template
 from app.models.individual import GeneReader
 from app.services.genetics import PopulationManager
 from app.database.operations import *
@@ -95,21 +95,23 @@ def fertilize():
         add_full_individual(child)
         return jsonify(child)
 
+# Acessando o html para criar populações
+
+
 # Criando populações
 @api.route('/populations', methods=['GET','POST'])
 def population_route():
 
     if request.method == 'GET':
         result = get_populations()
-        return jsonify(result)
+        for i in result:
+            indvs = get_all_individuals(i['id'])
+        return render_template('create_population.html', populations=result, indvs=indvs)
     
     elif request.method == 'POST':
-        data = request.get_json()
-        data = dict(data)
-
-        name = data['name']
-        population = add_population(name)
-        return jsonify(population)
+        name = request.form['name']
+        add_population(name)
+        return redirect('/populations')
 
 # Retornando um JSON com todas as estatísticas dos peixes criados
 @api.route('/statistics')
@@ -128,10 +130,8 @@ def delete_individual_route(id):
     return result
 
 # Deletando uma população
-@api.route('/delete/population/<population_id>', methods=['DELETE'])
+@api.route('/delete/population/<population_id>', methods=['POST'])
 def delete_population_route(population_id):
-
-    population_id = str(population_id)
     
     result = delete_population(population_id)
 
