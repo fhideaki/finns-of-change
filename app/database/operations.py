@@ -3,6 +3,7 @@ import sqlite3
 import json
 from app.models.individual import GeneReader
 from flask import jsonify
+import colorsys
 # import pandas as pd
 
 # Lista das operações do banco de dados
@@ -78,11 +79,13 @@ def add_karyotype(indv_id, individual_dict):
     return last_id
 
 # Inserindo o indivíduo automaticamente (chamando as funções acima)
-def add_full_individual(individual_dict):
-    individual = add_individual(individual_dict)
-    add_karyotype(individual, individual_dict)
+def add_full_individual(individual_dict, population_id):
 
-    return print("Individual added!")
+    individual_id_inserted = add_individual(individual_dict, population_id)
+
+    add_karyotype(individual_id_inserted, individual_dict)
+
+    return True
 
 # Buscando todos os indivíduos da tabela
 def get_all_individuals(population_id=None):
@@ -91,14 +94,14 @@ def get_all_individuals(population_id=None):
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    if population_id:
-        cursor.execute("""
-            SELECT * FROM individuals WHERE population_id = ?
-            """, (population_id,))
-    else:
+    if population_id is None:
         cursor.execute("""
             SELECT * FROM individuals
             """)
+    else:
+        cursor.execute("""
+            SELECT * FROM individuals WHERE population_id = ?
+            """, (population_id,))
     
     results = cursor.fetchall()
 
@@ -125,6 +128,7 @@ def get_individual_by_id(indv_id):
 
     return dict(individual)
 
+# Buscando um cariótipo com o id específico
 def get_karyotype_by_id(indv_id):
     
     conn = sqlite3.connect('fishes.db')
@@ -180,7 +184,13 @@ def get_populations():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT * FROM population
+        SELECT 
+            p.id,
+            p.name,
+            COUNT(i.id) as population_size
+        FROM population p
+        LEFT JOIN individuals i ON p.id = i.population_id
+        GROUP BY p.id
         """)
         
     results = cursor.fetchall()
@@ -188,56 +198,74 @@ def get_populations():
     cursor.close()
     conn.close()
 
-    return [dict(row) for row in results]
+    # Transformando em dicionário
+    populations = []
+    for row in results:
+        populations.append({
+            'id':row[0],
+            'name':row[1],
+            'population_size':row[2]
+        })
+
+    return populations
 
 # Buscando todas as informações para retornar um DataFrame
 def build_statistics_dataframe():
 
     individuals_dict = get_all_individuals()
 
-    dict_for_dataframe = []
-    
+    list_for_dataframe = []
+
+    populations = get_populations()
+
     for i in individuals_dict:
-        dict(i)
-        id = i['id']
-        karyo = get_karyotype_by_id(id)
-        characteristics = get_individual_characteristics(id)
+        karyo = get_karyotype_by_id(i['id'])
+        characteristics = get_individual_characteristics(i['id'])
+
         i.update(karyo)
         i.update(characteristics)
 
-        if i['chromosome_origin'] == None:
-            chromosome_origin_father = None
-            chromosome_origin_mother = None
-            cutting_points_father = None
-            cutting_points_mother = None
-        else:
-            chromosome_origin_father = i['chromosome_origin']['father_gamete']
-            chromosome_origin_mother = i['chromosome_origin']['mother_gamete']
-            cutting_points_father = i['cutting_points']['father']
-            cutting_points_mother = i['cutting_points']['mother']
+        chromosome_origin_father = None
+        chromosome_origin_mother = None
+        cutting_points_father = None
+        cutting_points_mother = None
 
+        if i.get('chromosome_origin') is not None:
+            chromosome_origin_father = i['chromosome_origin'].get('father_gamete')
+            chromosome_origin_mother = i['chromosome_origin'].get('mother_gamete')
+            cutting_points_father = i['cutting_points'].get('father')
+            cutting_points_mother = i['cutting_points'].get('mother')
+
+        population_id = i.get('population_id')
+        population_name = None
+        
+        for pop in populations:
+            if pop['id'] == population_id:
+                population_name = pop['name']
+                break
+        
         individual = {
-            'id': i['id'],
-            'father_id':i['father_id'],
-            'mother_id':i['mother_id'],
-            'generation':i['generation'],
-            'population_id':i['population_id'],
+            'id': i.get('id'),
+            'father_id': i.get('father_id'),
+            'mother_id': i.get('mother_id'),
+            'generation': i.get('generation'),
+            'population_id': population_id,
+            'population_name': population_name,
             'chromosome_origin_father': chromosome_origin_father,
             'chromosome_origin_mother': chromosome_origin_mother,
             'cutting_points_father': cutting_points_father,
             'cutting_points_mother': cutting_points_mother,
-            'gender': i['gender'],
-            'color': i['color'],
-            'swimming_speed': i['swimming_speed'],
-            'method': i['method'],
-            'karyotype_pair_1': i['karyotype'][0:2],
-            'karyotype_pair_2': i['karyotype'][2:4],
-            'karyotype_pair_3': i['karyotype'][4:6],
-            'timestamp':i['timestamp']
-
+            'gender': i.get('gender'),
+            'color': i.get('color'),
+            'swimming_speed': i.get('swimming_speed'),
+            'method': i.get('method'),
+            'karyotype':i['karyotype'],
+            'timestamp': i.get('timestamp')
         }
-        dict_for_dataframe.append(individual)
-    return dict_for_dataframe
+
+        list_for_dataframe.append(individual)
+
+    return list_for_dataframe
 
 # Deletando um indivíduo da tabela (e também o cariótipo)
 def delete_individual(id):
@@ -287,5 +315,14 @@ def delete_population(population_id):
         return jsonify({'message':'Population not found'}), 404
     else:
         return jsonify({'message':'Population deleted'}), 200
+    
+# Convertendo cores Hex para Hsv
+def hex_to_hsv(hex_color):
+
+    hex_color = hex_color.lstrip('#')
+    r = int(hex_color[0:2], 16) / 255.0
+    g = int(hex_color[2:4], 16) / 255.0
+    b = int(hex_color[4:6], 16) / 255.0
+    return colorsys.rgb_to_hsv(r, g, b)
     
     

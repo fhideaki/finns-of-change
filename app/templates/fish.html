@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Finns of Change Index Page{% endblock %}
+
+{% block content %}
+<!-- Dashboard com informações -->
+<div class="bg-white dark:bg-gray-900 shadow rounded-lg p-6 relative" style="margin-bottom: 20px;">
+    
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-5xl font-bold text-gray-900 dark:text-white text-center">Fish Overview</h2> 
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 "> 
+    
+        <div class="grid w-full grid-cols-1 gap-2">
+
+            <div class="text-center dark:bg-gray-800 rounded-lg py-3"> 
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">ID</h3>
+                <p class="mt-2 text-2xl font-bold text-blue-600 dark:text-blue-400">{{ fish_id }}</p>
+            </div>
+
+            <div class="text-center dark:bg-gray-800 rounded-lg py-4 h-30 flex flex-col justify-center items-center">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Color</h3>
+                <div id="fishColorDisplay" class="w-24 h-24 rounded-full border-4 border-gray-400 dark:border-gray-500"></div>
+                <p class="mt-2 text-2xl font-bold text-gray-800 dark:text-white">{{ color }}</p>
+            </div>
+
+        </div>
+
+        <div class="grid w-full grid-cols-1 gap-6">
+
+            <div class="text-center dark:bg-gray-800 rounded-lg py-3">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Generation</h3>
+                <p class="mt-2 text-8xl font-bold text-blue-600 dark:text-blue-400">{{ generation }}</p>
+            </div>
+
+            <div class="text-center dark:bg-gray-800 rounded-lg py-3">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Gender</h3>
+                <p class="mt-2 text-8xl font-bold text-blue-600 dark:text-blue-400">{{ gender }}</p>
+            </div>
+        </div>
+
+        <div class="grid w-full grid-cols-1 gap-6"> 
+
+            <div class="text-center dark:bg-gray-800 rounded-lg py-4"> 
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Swimming Speed</h3>
+                <p class="mt-2 text-8xl font-bold text-blue-600 dark:text-blue-400">{{ swimming_speed }}</p>
+            </div>
+
+            <div class="text-center dark:bg-gray-800 rounded-lg py-3">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Population</h3>
+                <p class="mt-2 text-2xl font-bold text-blue-600 dark:text-blue-400">{{ population_id }} - {{ population_name }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white dark:bg-gray-900 shadow rounded-lg p-6 relative">
+    <h2 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-6">Family Tree</h2>
+    <div id="familyTree" class="flex justify-center">
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Obter o elemento para exibir a cor
+        const fishColorDisplay = document.getElementById('fishColorDisplay');
+        const fishColor = "{{ color }}";
+        if (fishColorDisplay && fishColor) {
+            fishColorDisplay.style.backgroundColor = fishColor;
+        }
+
+        const familyTreeData = {{ family_tree_data | tojson | safe }};
+
+        const createFishNode = (fish) => {
+            const node = document.createElement('div');
+            node.className = "flex flex-col items-center p-2 rounded-lg shadow dark:bg-gray-800";
+            
+            const isLink = fish.id != "{{ fish_id }}";
+            
+            if (isLink) {
+                node.innerHTML = `<a href="/individual/${fish.id}/analysis" class="font-bold text-blue-600 dark:text-blue-400 hover:underline">ID: ${fish.id}</a>`;
+            } else {
+                node.innerHTML = `<p class="font-bold text-gray-800 dark:text-white">ID: ${fish.id}</p>`;
+            }
+            
+            return node;
+        };
+
+        const renderTree = (node, parentElement) => {
+            if (!node || !parentElement) {
+                return;
+            }
+
+            // Contêiner para o nó atual e seus pais
+            const nodeWrapper = document.createElement('div');
+            nodeWrapper.className = "flex flex-col items-center";
+
+            // Se for um nó de pais, adicione uma linha vertical de conexão
+            if (parentElement.id !== 'familyTree') {
+                const lineVertical = document.createElement('div');
+                lineVertical.className = "w-px h-8 bg-gray-400 dark:bg-gray-500 my-2";
+                nodeWrapper.appendChild(lineVertical);
+            }
+            
+            // Adiciona o nó do peixe
+            const fishNode = createFishNode(node);
+            nodeWrapper.appendChild(fishNode);
+
+            // Renderiza os pais recursivamente, se existirem
+            if (node.parents && node.parents.length > 0) {
+                // Contêiner para os pais e a linha horizontal
+                const parentsContainer = document.createElement('div');
+                parentsContainer.className = "flex justify-center items-start mt-4 space-x-16";
+                parentsContainer.style.position = 'relative';
+                
+                // Cria o contêiner para os pais
+                const fatherWrapper = document.createElement('div');
+                fatherWrapper.className = "flex flex-col items-center";
+                const motherWrapper = document.createElement('div');
+                motherWrapper.className = "flex flex-col items-center";
+
+                // Renderiza o pai e a mãe
+                renderTree(node.parents[0], fatherWrapper);
+                if (node.parents.length > 1) {
+                    renderTree(node.parents[1], motherWrapper);
+                }
+
+                parentsContainer.appendChild(fatherWrapper);
+                parentsContainer.appendChild(motherWrapper);
+
+                // Cria a linha vertical de conexão com os pais
+                const lineVertical = document.createElement('div');
+                lineVertical.className = "w-px h-8 bg-gray-400 dark:bg-gray-500 my-2";
+                nodeWrapper.appendChild(lineVertical);
+
+                // Cria a linha horizontal que conecta os pais
+                const lineHorizontal = document.createElement('div');
+                lineHorizontal.className = "absolute top-0 h-px bg-gray-400 dark:bg-gray-500";
+                lineHorizontal.style.left = '48px'; // Ajuste este valor para o espaçamento ideal
+                lineHorizontal.style.right = '48px'; // Ajuste este valor para o espaçamento ideal
+                parentsContainer.appendChild(lineHorizontal);
+
+                // Adicione as linhas verticais para cada pai, conectando-os à linha horizontal
+                const lineVerticalFather = document.createElement('div');
+                lineVerticalFather.className = "w-px h-8 bg-gray-400 dark:bg-gray-500 my-2";
+                parentsContainer.children[0].insertBefore(lineVerticalFather, parentsContainer.children[0].firstChild); // Adiciona acima do nó do pai
+
+                const lineVerticalMother = document.createElement('div');
+                lineVerticalMother.className = "w-px h-8 bg-gray-400 dark:bg-gray-500 my-2";
+                parentsContainer.children[1].insertBefore(lineVerticalMother, parentsContainer.children[1].firstChild); // Adiciona acima do nó da mãe
+
+                // Em seguida, anexe o parentsContainer ao nodeWrapper
+                nodeWrapper.appendChild(parentsContainer);
+            }
+            
+            parentElement.appendChild(nodeWrapper);
+        };
+        
+        const familyTreeContainer = document.getElementById('familyTree');
+        renderTree(familyTreeData, familyTreeContainer);
+    });
+</script>
+{% endblock %}

@@ -168,11 +168,10 @@ class PopulationManager():
         self.population_counter += 1
         self.population.append(new_individual)
         
-        return new_individual
-        
-        
+        return new_individual   
+    
     # Método para criar indivíduos que não vão ter pais
-    def create_individual(self):
+    def create_individual(self, population_id):
         
         # Criando uma instância da classe Nucleus()
         nucleus = Nucleus()
@@ -190,6 +189,7 @@ class PopulationManager():
             'karyotype':nucleus.karyotype,
             'chromosome_origin':None,
             'timestamp':datetime.now().isoformat(),
+            'population_id':population_id,
             'metadados':{
                 'cutting_points':None,
                 'method':'create_dna'

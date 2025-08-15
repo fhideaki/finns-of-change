@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html class="dark">
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <meta charset="UTF-8" />
+    <title>{% block title %}Finns of Change API{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+            #bg-video {
+                position: fixed;
+                right: 0;
+                bottom: 0;
+                min-width: 100%;
+                min-height: 100%;
+                width: auto;
+                height: auto;
+                z-index: -100;
+                filter: brightness(50%); 
+                object-fit: cover;
+            }
+
+            .content-wrapper {
+                position: relative;
+                z-index: 1;
+                padding: 20px;
+            }
+
+            .bg-white { 
+                background-color: rgba(255, 255, 255, 0.8);
+            }
+
+            .dark:bg-gray-900 {
+                background-color: rgba(17, 24, 39, 0.8); 
+            }
+
+            .para_outline{
+                color: white;
+                font-weight: bold;
+                font-size: 300%;
+                -webkit-text-stroke: 2px darkblue;
+            }
+
+            div[modal-backdrop] {
+                background-color: transparent !important; /* Torna-o invisível */
+                pointer-events: none !important; /* Permite cliques através dele */
+            }
+
+    </style>
+</head>
+<body class="dark">
+
+    <nav class="bg-white border-gray-200 dark:bg-gray-900">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <a href="{{ url_for('api.index') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
+                <img src="{{ url_for('static', filename='images/fish_logo.png') }}" class="h-8" alt="FoC Logo" />
+                <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Finns of Change API</span>
+            </a>
+            <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
+                <span class="sr-only">Open main menu</span>
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                </svg>
+            </button>
+            <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+                <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                    <li><a href="/" class="block py-2 px-3 text-white hover:text-blue-500">Home</a></li>
+                    <li><a href="/populations" class="block py-2 px-3 text-white hover:text-blue-500">Population Manager</a></li>
+                    <li><a href="/individuals" class="block py-2 px-3 text-white hover:text-blue-500">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <video autoplay muted loop id="bg-video">
+        <source src="{{ url_for('static', filename='videos/background_video.mp4') }}" type="video/mp4">
+        Seu navegador não suporta a tag de vídeo.
+    </video>
+
+    <div class="content-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+    <script>
+        // Função de confirmação de exclusão (fora do DOMContentLoaded, pois é uma função simples)
+        function confirmDelete() {
+            return confirm("Are you sure you want to delete? This action cannot be undone.");
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Script para "selecionar todas" as checkboxes no modal
+            const checkboxAll = document.getElementById('checkbox-all-populations');
+            // Seletor mais específico para garantir que só pegamos checkboxes dentro do modal
+            const checkboxes = document.querySelectorAll('#export-json-modal input[name="selected_populations"]');
+
+            if (checkboxAll) {
+                checkboxAll.addEventListener('change', function() {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = checkboxAll.checked;
+                    });
+                });
+            }
+
+            // se uma checkbox individual for desmarcada
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (!this.checked) {
+                        if (checkboxAll) { 
+                            checkboxAll.checked = false;
+                        }
+                    } else {
+                        // Verifica se todas as outras estão marcadas para marcar o "selecionar todas"
+                        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                        if (checkboxAll && allChecked) {
+                            checkboxAll.checked = true;
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

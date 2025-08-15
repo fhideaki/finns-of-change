@@ -39,8 +39,19 @@ class GeneReader():
     # A cor geralmente é definida pela quantidade de melanina, que é sintetizada pela tirosina (tyrosine)
         color_chromosomes = aminoacids[0] + aminoacids[1]
         color_gene = {x: color_chromosomes.count(x) for x in set(color_chromosomes)}
-        self.color = hex(color_gene.get('tyrosine',0) * 1000)
+
+        r = color_gene.get('tyrosine', 0) * 100
+        if r > 255:
+            r = 255
+        g = color_gene.get('histidine', 0) * 100
+        if g > 255:
+            g = 255
+        b = color_gene.get('alanine', 0) * 100
+        if b > 255:
+            b = 255
         
+        self.color = f"{r:02x}{g:02x}{b:02x}"
+
         return self.color
     
     def get_swimming_speed(self, aminoacids):

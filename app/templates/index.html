@@ -1,84 +1,227 @@
-<html class="dark">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport"   content="width=device-width, initial-scale=1.0" />
-        <title>
-            Index Page for the Finns of Change API
-        </title> 
-        <script src="https://cdn.tailwindcss.com"></script>
-        <style>
-            body {
-                background-image: url("C:/Users/Fernando/Hideaki/Programas Python/finns-of-change/images/background.jpg");
-                background-size: cover;
-                background-repeat: no-repeat;
-                background-attachment: fixed;
-            }
+{% extends 'base.html' %}
 
-            .para_outline{
-                color: white;
-                font-weight: bold;
-                font-size: 300%;
-                -webkit-text-stroke: 2px darkblue;
+{% block title %}Finns of Change Index Page{% endblock %}
 
-            }
-        </style>
-    </head>
-    <body class="dark">
+{% block content %}
+<!-- Dashboard com informações -->
+<div class="bg-white dark:bg-gray-900 shadow rounded-lg p-6 relative" style="margin-bottom: 20px;">
+    
+    <!-- Dropdown -->
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-5xl font-bold text-gray-900 dark:text-white text-center">Statistics Overview</h2> 
         
+        <div class="z-10"> 
+            <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                {% if standard_population == 0 %}
+                    All Populations
+                {% else %}
+                    {{ standard_population }} - {{ population_name }}
+                {% endif %}
+                <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                </svg>
+            </button>
 
-        <nav class="bg-white border-gray-200 dark:bg-gray-900">
-            <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                <a href="http://127.0.0.1:5000/" class="flex items-center space-x-3 rtl:space-x-reverse">
-                    <img src="C:\Users\Fernando\Hideaki\Programas Python\finns-of-change\images\fish_logo.png" class="h-8" alt="FoC Logo" />
-                    <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Finns of Change API</span>
-                </a>
-                <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
-                    <span class="sr-only">Open main menu</span>
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
-                    </svg>
-                </button>
-                <div class="hidden w-full md:block md:w-auto" id="navbar-default">
-                <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                     <li>
-                    <a href="#" class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent" aria-current="page">Home</a>
+                        <a href="{{ url_for('api.index', population='all') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white {% if selected_population == 'all' %}bg-gray-100 dark:bg-gray-600{% endif %}">All Populations</a>
                     </li>
+                    {% for population in all_populations_data %}
                     <li>
-                    <a href="#" class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Populations</a>
+                        <a href="{{ url_for('api.index', population=population.id) }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white {% if population.name|string == selected_population %}bg-gray-100 dark:bg-gray-600{% endif %}">{{ population.id }} - {{ population.name }}</a>
                     </li>
-                    <li>
-                    <a href="#" class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Individuals</a>
-                    </li>
-                    <li>
-                    <a href="#" class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Fertilization</a>
-                    </li>
-                    <li>
-                    <a href="#" class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Statistics</a>
-                    </li>
+                    {% endfor %}
                 </ul>
-                </div>
             </div>
-        </nav>
+        </div>
+    </div>
 
-        <div>
-            <div class="container py-12 px-4 text-center">
-                <p class="para_outline">Welcome to the Finns of Change API!</p>
-                <p class="text-lg text-darkblue mt-4">Manage fish populations, individuals and also their lineages!</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 "> 
+    
+        <div class="grid w-full grid-cols-1 gap-2">
+
+            <div class="text-center dark:bg-gray-800 rounded-lg py-3"> 
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Total Populations</h3>
+                <p class="mt-2 text-8xl font-bold text-blue-600 dark:text-blue-400">{{ total_populations }}</p>
             </div>
-            <div class="justify-center flex gap-4 mt-8">
-                <button class="bg-gray-900 hover:bg-blue-500 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
-                  Create New Population
-                </button>
-                <button class="bg-gray-900 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
-                  Create Gen 0 Fishes
-                </button>
-                <button class="bg-gray-900 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
-                  Initiate Feritilization
-                </button>
+
+            <div class="text-center dark:bg-gray-800 rounded-lg py-4 h-30">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Color Distribution</h3>
+                <canvas id="colorChart" class="w-full h-auto" width="100" height="100"></canvas>
             </div>
 
         </div>
 
-    </body>
+        <div class="grid w-full grid-cols-1 gap-6">
 
-</html>
+            <div class="text-center dark:bg-gray-800 rounded-lg py-3">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Total Fishes</h3>
+                <p class="mt-2 text-8xl font-bold text-blue-600 dark:text-blue-400">{{ total_fishes }}</p>
+            </div>
+
+            <div class="text-center dark:bg-gray-800 rounded-lg py-3">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Average Swimming Speed</h3>
+                <p class="mt-2 text-8xl font-bold text-blue-600 dark:text-blue-400">{{ avg_speed }} m/s</p>
+            </div>
+        </div>
+
+        <div class="grid w-full grid-cols-1 gap-6"> 
+
+            <div class="text-center dark:bg-gray-800 rounded-lg py-4"> 
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Male / Female Ratio</h3>
+                <canvas id="sexRatioChart" class="w-full h-auto" width="250" height="250"></canvas>
+            </div>
+
+            <div class="text-center dark:bg-gray-800 rounded-lg py-3">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Generations</h3>
+                <p class="mt-2 text-8xl font-bold text-blue-600 dark:text-blue-400">{{ generations }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabela com os indivíduos -->
+<div class="bg-white dark:bg-gray-900 shadow rounded-lg p-8 relative" style="margin-top: 20px;">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-5xl font-bold text-gray-900 dark:text-white text-center">Fishes List</h2>
+    </div>
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-6">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">
+                        ID
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Generation
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Gender
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Timestamp
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Population ID
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Population Name
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Father ID
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Mother ID
+                    </th>
+                    {# <th scope="col" class="px-6 py-3">
+                        <span class="sr-only">Actions</span>
+                    </th> #}
+                </tr>
+            </thead>
+            <tbody>
+                {% for individual in individuals %}
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        {{ individual.id }}
+                    </th>
+                    <td class="px-6 py-4">
+                        {{ individual.generation }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ individual.gender }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ individual.timestamp }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ individual.population_id }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ individual.population_name }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ individual.father_id if individual.father_id is not none else '-' }} {# Exibe '-' se não houver pai #}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ individual.mother_id if individual.mother_id is not none else '-' }} {# Exibe '-' se não houver mãe #}
+                    </td>
+                    {# Exemplo de coluna de ação #}
+                    {# <td class="px-6 py-4 text-right">
+                        <a href="{{ url_for('api.individual_details', id=individual.id) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</a>
+                    </td> #}
+                </tr>
+                {% else %}
+                {# Mensagem caso não haja indivíduos para a população selecionada #}
+                <tr class="bg-white dark:bg-gray-800">
+                    <td colspan="8" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                        No individuals found for this population.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Gráfico de Cores
+    const colorCtx = document.getElementById('colorChart').getContext('2d');
+    new Chart(colorCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ color_data.keys() | list | tojson }},
+            datasets: [{
+                data: {{ color_data.values() | list | tojson }},
+                backgroundColor: {{ color_data.keys() | list | tojson }},
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks:{
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed !== null) {
+                                label += context.parsed + ' ocorrências';
+                            }
+                            return label;
+                        }
+                    }
+                },
+                borderColor: '#ffffff',
+                borderWidth: 2
+            }
+        }
+    });
+
+    // Gráfico Machos/Fêmeas
+    const sexCtx = document.getElementById('sexRatioChart').getContext('2d');
+    new Chart(sexCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Machos', 'Fêmeas'],
+            datasets: [{
+                data: [{{ sex_data['male'] }}, {{ sex_data['female'] }}],
+                backgroundColor: ['#60a5fa', '#f472b6'],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    labels: { color: 'white' }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
