@@ -44,14 +44,14 @@
             }
 
             div[modal-backdrop] {
-                background-color: transparent !important; /* Torna-o invisível */
-                pointer-events: none !important; /* Permite cliques através dele */
+                background-color: transparent !important;
+                pointer-events: none !important;
             }
 
     </style>
 </head>
 <body class="dark">
-
+    <!-- Navbar -->
     <nav class="bg-white border-gray-200 dark:bg-gray-900">
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
             <a href="{{ url_for('api.index') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
@@ -76,7 +76,7 @@
 
     <video autoplay muted loop id="bg-video">
         <source src="{{ url_for('static', filename='videos/background_video.mp4') }}" type="video/mp4">
-        Seu navegador não suporta a tag de vídeo.
+        Your browser does not support video.
     </video>
 
     <div class="content-wrapper">
@@ -86,15 +86,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
     <script>
-        // Função de confirmação de exclusão (fora do DOMContentLoaded, pois é uma função simples)
+        // Confirmação de exclusão
+        // Exclusion confirmation
         function confirmDelete() {
             return confirm("Are you sure you want to delete? This action cannot be undone.");
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             // Script para "selecionar todas" as checkboxes no modal
+            // Script to "Select all" the checkboxes from modal
             const checkboxAll = document.getElementById('checkbox-all-populations');
-            // Seletor mais específico para garantir que só pegamos checkboxes dentro do modal
+            // Especificando para selecionar as checkboxes do modal
+            // Specifying to select only the modal's checkboxes
             const checkboxes = document.querySelectorAll('#export-json-modal input[name="selected_populations"]');
 
             if (checkboxAll) {
@@ -105,7 +108,8 @@
                 });
             }
 
-            // se uma checkbox individual for desmarcada
+            // Verificando se uma checkbox individual for desmarcada
+            // Checking if a single checkbox was deselected
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
                     if (!this.checked) {
@@ -114,9 +118,81 @@
                         }
                     } else {
                         // Verifica se todas as outras estão marcadas para marcar o "selecionar todas"
+                        // Checking if the others are checked to check "select all"
                         const allChecked = Array.from(checkboxes).every(cb => cb.checked);
                         if (checkboxAll && allChecked) {
                             checkboxAll.checked = true;
+                        }
+                    }
+                });
+            });
+
+            // Script para "selecionar todas" as checkboxes no modal de deletar em massa
+            // Script to "Select all" the checkboxes from modal
+            const deleteCheckboxAll = document.getElementById('checkbox-all-fishes');
+            const deleteCheckboxes = document.querySelectorAll('#mass-delete input[name="selected_fishes"]');
+
+            if (deleteCheckboxAll) {
+                deleteCheckboxAll.addEventListener('change', function() {
+                    deleteCheckboxes.forEach(checkbox => {
+                        checkbox.checked = deleteCheckboxAll.checked;
+                    });
+                });
+            }
+            deleteCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (!this.checked && deleteCheckboxAll) {
+                        deleteCheckboxAll.checked = false;
+                    } else {
+                        const allChecked = Array.from(deleteCheckboxes).every(cb => cb.checked);
+                        if (deleteCheckboxAll && allChecked) {
+                            deleteCheckboxAll.checked = true;
+                        }
+                    }
+                });
+            });
+
+            const selectedFertilizationFemale = document.getElementById('checkbox-female-fishes');
+            const selectedFertilizationFemaleCheckboxes = document.querySelectorAll('#selected-fertilization-modal input[name="selected_female_fishes[]"]');
+
+            if (selectedFertilizationFemale) {
+                selectedFertilizationFemale.addEventListener('change', function() {
+                    selectedFertilizationFemaleCheckboxes.forEach(checkbox => {
+                        checkbox.checked = selectedFertilizationFemale.checked;
+                    });
+                });
+            }
+            selectedFertilizationFemaleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (!this.checked && selectedFertilizationFemale) {
+                        selectedFertilizationFemale.checked = false;
+                    } else {
+                        const allChecked = Array.from(selectedFertilizationFemaleCheckboxes).every(cb => cb.checked);
+                        if (selectedFertilizationFemale && allChecked) {
+                            selectedFertilizationFemale.checked = true;
+                        }
+                    }
+                });
+            });
+
+            const selectedFertilizationMale = document.getElementById('checkbox-male-fishes');
+            const selectedFertilizationMaleCheckboxes = document.querySelectorAll('#selected-fertilization-modal input[name="selected_male_fishes[]"]');
+
+            if (selectedFertilizationMale) {
+                selectedFertilizationMale.addEventListener('change', function() {
+                    selectedFertilizationMaleCheckboxes.forEach(checkbox => {
+                        checkbox.checked = selectedFertilizationMale.checked;
+                    });
+                });
+            }
+            selectedFertilizationMaleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (!this.checked && selectedFertilizationMale) {
+                        selectedFertilizationMale.checked = false;
+                    } else {
+                        const allChecked = Array.from(selectedFertilizationMaleCheckboxes).every(cb => cb.checked);
+                        if (selectedFertilizationMale && allChecked) {
+                            selectedFertilizationMale.checked = true;
                         }
                     }
                 });

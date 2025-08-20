@@ -2,12 +2,15 @@
 import sqlite3
 
 # Conectando ao DB
+# Connecting to the DB
 conn = sqlite3.connect('fishes.db')
 
 # Criando um cursor
+# Creating a cursor
 cursor = conn.cursor()
 
 # Criando a tabela dos peixes
+# Creating the fish table
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS population (
                id INTEGER PRIMARY KEY AUTOINCREMENT,

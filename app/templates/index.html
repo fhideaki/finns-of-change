@@ -4,6 +4,7 @@
 
 {% block content %}
 <!-- Dashboard com informações -->
+ <!-- Statistics dashboard -->
 <div class="bg-white dark:bg-gray-900 shadow rounded-lg p-6 relative" style="margin-bottom: 20px;">
     
     <!-- Dropdown -->
@@ -82,6 +83,7 @@
 </div>
 
 <!-- Tabela com os indivíduos -->
+<!-- Individuals table -->
 <div class="bg-white dark:bg-gray-900 shadow rounded-lg p-8 relative" style="margin-top: 20px;">
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-5xl font-bold text-gray-900 dark:text-white text-center">Fishes List</h2>
@@ -152,7 +154,8 @@
                     </td> #}
                 </tr>
                 {% else %}
-                {# Mensagem caso não haja indivíduos para a população selecionada #}
+                <!-- Mensagem caso não haja indivíduos para a população selecionada -->
+                <!-- Error message if there are no individuals for the selected population -->
                 <tr class="bg-white dark:bg-gray-800">
                     <td colspan="8" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                         No individuals found for this population.
@@ -166,6 +169,7 @@
 
 <script>
     // Gráfico de Cores
+    // Color chart
     const colorCtx = document.getElementById('colorChart').getContext('2d');
     new Chart(colorCtx, {
         type: 'pie',
@@ -204,6 +208,7 @@
     });
 
     // Gráfico Machos/Fêmeas
+    // Male/Female Chart
     const sexCtx = document.getElementById('sexRatioChart').getContext('2d');
     new Chart(sexCtx, {
         type: 'doughnut',

@@ -4,11 +4,12 @@ import json
 from app.models.individual import GeneReader
 from flask import jsonify
 import colorsys
-# import pandas as pd
 
 # Lista das operações do banco de dados
+# Database operations list
 
 # Inserindo uma população na tabela
+# Inserting a population in the table
 def add_population(name):
     
     conn = sqlite3.connect('fishes.db')
@@ -28,6 +29,7 @@ def add_population(name):
     return last_id
     
 # Inserindo um indivíduo na tabela
+# Inserting an individual in the table
 def add_individual(individual_dict, population_id):
 
     conn = sqlite3.connect('fishes.db')
@@ -54,6 +56,7 @@ def add_individual(individual_dict, population_id):
     return indv_id
 
 # Inserindo um cariótipo na tabela
+# Inserting a karyotype in the table
 def add_karyotype(indv_id, individual_dict):
 
     conn = sqlite3.connect('fishes.db')
@@ -79,6 +82,7 @@ def add_karyotype(indv_id, individual_dict):
     return last_id
 
 # Inserindo o indivíduo automaticamente (chamando as funções acima)
+# Automatically inserting the individual (calling the functions above)
 def add_full_individual(individual_dict, population_id):
 
     individual_id_inserted = add_individual(individual_dict, population_id)
@@ -88,6 +92,7 @@ def add_full_individual(individual_dict, population_id):
     return True
 
 # Buscando todos os indivíduos da tabela
+# Getting all individuals from table
 def get_all_individuals(population_id=None):
 
     conn = sqlite3.connect('fishes.db')
@@ -111,6 +116,7 @@ def get_all_individuals(population_id=None):
     return [dict(row) for row in results]
 
 # Buscando um indivíduo com o id específico
+# Searching for an individual with a specific ID
 def get_individual_by_id(indv_id):
     
     conn = sqlite3.connect('fishes.db')
@@ -129,6 +135,7 @@ def get_individual_by_id(indv_id):
     return dict(individual)
 
 # Buscando um cariótipo com o id específico
+# Getting a karyotype with the specific ID
 def get_karyotype_by_id(indv_id):
     
     conn = sqlite3.connect('fishes.db')
@@ -156,6 +163,7 @@ def get_karyotype_by_id(indv_id):
     return karyo_dict
 
 # Buscando as características individuais e também os genes
+# Getting the individual characteristics and also the genes
 def get_individual_characteristics(id):
     data = {'indv_id':id}
     indv_id = data['indv_id']
@@ -177,6 +185,7 @@ def get_individual_characteristics(id):
     return result
 
 # Buscando todas as populações da tabela
+# Getting all populations from the table
 def get_populations():
 
     conn = sqlite3.connect('fishes.db')
@@ -210,6 +219,7 @@ def get_populations():
     return populations
 
 # Buscando todas as informações para retornar um DataFrame
+# Getting all of the information to return a dataframe
 def build_statistics_dataframe():
 
     individuals_dict = get_all_individuals()
@@ -268,6 +278,7 @@ def build_statistics_dataframe():
     return list_for_dataframe
 
 # Deletando um indivíduo da tabela (e também o cariótipo)
+# Deleting an individual from the table (and also the karyotype)
 def delete_individual(id):
     conn = sqlite3.connect('fishes.db')
     cursor = conn.cursor()
@@ -288,6 +299,7 @@ def delete_individual(id):
         return jsonify({'message':'Individual deleted'}), 200
     
 # Deletando uma população inteira
+# Deleting an entire population
 def delete_population(population_id):
     conn = sqlite3.connect('fishes.db')
     cursor = conn.cursor()
@@ -317,6 +329,7 @@ def delete_population(population_id):
         return jsonify({'message':'Population deleted'}), 200
     
 # Convertendo cores Hex para Hsv
+# Converting Hex colors to HSV
 def hex_to_hsv(hex_color):
 
     hex_color = hex_color.lstrip('#')

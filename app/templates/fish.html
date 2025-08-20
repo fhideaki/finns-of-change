@@ -4,6 +4,7 @@
 
 {% block content %}
 <!-- Dashboard com informações -->
+<!-- Statistics Dashboard -->
 <div class="bg-white dark:bg-gray-900 shadow rounded-lg p-6 relative" style="margin-bottom: 20px;">
     
     <div class="flex items-center justify-between mb-6">
@@ -64,6 +65,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Obter o elemento para exibir a cor
+        // Get the element to show the color
         const fishColorDisplay = document.getElementById('fishColorDisplay');
         const fishColor = "{{ color }}";
         if (fishColorDisplay && fishColor) {
@@ -93,10 +95,12 @@
             }
 
             // Contêiner para o nó atual e seus pais
+            // Container for the current node and its parents
             const nodeWrapper = document.createElement('div');
             nodeWrapper.className = "flex flex-col items-center";
 
             // Se for um nó de pais, adicione uma linha vertical de conexão
+            // If it is a parent node, add a vertical connection line
             if (parentElement.id !== 'familyTree') {
                 const lineVertical = document.createElement('div');
                 lineVertical.className = "w-px h-8 bg-gray-400 dark:bg-gray-500 my-2";
@@ -104,23 +108,28 @@
             }
             
             // Adiciona o nó do peixe
+            // Add the fish node
             const fishNode = createFishNode(node);
             nodeWrapper.appendChild(fishNode);
 
             // Renderiza os pais recursivamente, se existirem
+            // Loop to render the parents, if they exist
             if (node.parents && node.parents.length > 0) {
                 // Contêiner para os pais e a linha horizontal
+                // Conteiner for the parents and the horizontal line
                 const parentsContainer = document.createElement('div');
                 parentsContainer.className = "flex justify-center items-start mt-4 space-x-16";
                 parentsContainer.style.position = 'relative';
                 
                 // Cria o contêiner para os pais
+                // Creating container for the parents
                 const fatherWrapper = document.createElement('div');
                 fatherWrapper.className = "flex flex-col items-center";
                 const motherWrapper = document.createElement('div');
                 motherWrapper.className = "flex flex-col items-center";
 
                 // Renderiza o pai e a mãe
+                // Renders father and mother
                 renderTree(node.parents[0], fatherWrapper);
                 if (node.parents.length > 1) {
                     renderTree(node.parents[1], motherWrapper);
@@ -130,27 +139,29 @@
                 parentsContainer.appendChild(motherWrapper);
 
                 // Cria a linha vertical de conexão com os pais
+                // Creating the vertical connection line with the parents
                 const lineVertical = document.createElement('div');
                 lineVertical.className = "w-px h-8 bg-gray-400 dark:bg-gray-500 my-2";
                 nodeWrapper.appendChild(lineVertical);
 
                 // Cria a linha horizontal que conecta os pais
+                // Create the horizontal line that connect the parents
                 const lineHorizontal = document.createElement('div');
                 lineHorizontal.className = "absolute top-0 h-px bg-gray-400 dark:bg-gray-500";
-                lineHorizontal.style.left = '48px'; // Ajuste este valor para o espaçamento ideal
-                lineHorizontal.style.right = '48px'; // Ajuste este valor para o espaçamento ideal
+                lineHorizontal.style.left = '48px'; 
+                lineHorizontal.style.right = '48px';
                 parentsContainer.appendChild(lineHorizontal);
 
-                // Adicione as linhas verticais para cada pai, conectando-os à linha horizontal
+                // Adiciona as linhas verticais para cada pai, conectando-os à linha horizontal
+                // Adding the vertical lines for each father, connecting them to the horizontal line
                 const lineVerticalFather = document.createElement('div');
                 lineVerticalFather.className = "w-px h-8 bg-gray-400 dark:bg-gray-500 my-2";
-                parentsContainer.children[0].insertBefore(lineVerticalFather, parentsContainer.children[0].firstChild); // Adiciona acima do nó do pai
+                parentsContainer.children[0].insertBefore(lineVerticalFather, parentsContainer.children[0].firstChild);
 
                 const lineVerticalMother = document.createElement('div');
                 lineVerticalMother.className = "w-px h-8 bg-gray-400 dark:bg-gray-500 my-2";
-                parentsContainer.children[1].insertBefore(lineVerticalMother, parentsContainer.children[1].firstChild); // Adiciona acima do nó da mãe
-
-                // Em seguida, anexe o parentsContainer ao nodeWrapper
+                parentsContainer.children[1].insertBefore(lineVerticalMother, parentsContainer.children[1].firstChild); 
+                
                 nodeWrapper.appendChild(parentsContainer);
             }
             

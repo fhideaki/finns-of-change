@@ -4,6 +4,7 @@
 
 {% block content %}
 <!-- Tabela com os indivíduos -->
+<!-- Individuals table -->
 <div class="bg-white dark:bg-gray-900 shadow rounded-lg p-8 relative" style="margin-top: 20px;">
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-5xl font-bold text-gray-900 dark:text-white text-center">{{ population_name }} Fish List</h2>
@@ -123,6 +124,7 @@
 </div>
 
 <!-- Botões e utilitários -->
+<!-- Buttons and other stuff -->
 <div class="bg-white dark:bg-gray-900 shadow rounded-lg p-8 relative" style="margin-top: 20px;">
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-5xl font-bold text-gray-900 dark:text-white text-center">Population Manager</h2>
@@ -145,22 +147,26 @@
             </div>
 
             <!-- Botão Create Gen 0 Individuals -->
+            <!-- Button to Create Gen 0 Individuals -->
             <button type="submit" class="flex-grow bg-blue-500 hover:bg-blue-900 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
                 Create
             </button>
         </form>
 
         <!-- Botão Fertilize -->
+        <!-- Fertilize Button -->
         <a href="{{ url_for('api.fertilize', population_id=population_id) }}" class="text-center flex-grow bg-blue-500 hover:bg-blue-900 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
             Fertilize
         </a>
         
         <!-- Botão Export JSON -->
+        <!-- Export JSON Button -->
         <button data-modal-target="export-json-modal" data-modal-toggle="export-json-modal" class="flex-grow bg-blue-500 hover:bg-blue-900 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" type="button">
             Export JSON
         </button>
 
         <!-- Botão Mass Delete -->
+        <!-- Mass Delete Button -->
         <button data-modal-target="mass-delete" data-modal-toggle="mass-delete" class="flex-grow bg-blue-500 hover:bg-blue-900 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" type="button">
             Mass Delete
         </button>
@@ -168,6 +174,7 @@
 </div>
 
 <!-- Modal para Export JSON -->
+<!-- Export JSON Modal -->
 <div id="export-json-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-100 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-2xl max-h-full">
         <!-- Modal content -->
@@ -254,6 +261,7 @@
 </div>
 
 <!-- Modal para Mass Delete -->
+<!-- Mass Delete Modal -->
 <div id="mass-delete" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-100 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-2xl max-h-full">
         <!-- Modal content -->
@@ -276,7 +284,6 @@
                     Select fishes to delete:
                 </p>
                 
-                {# Tabela de Indivíduos Selecionáveis #}
                 <form id="delete-fishes-form" action="{{ url_for('api.delete_individuals_route') }}" method="post">
                     <div class="relative overflow-y-auto max-h-64 overflow-x-auto shadow-md sm:rounded-lg">
                         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">

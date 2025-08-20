@@ -5,6 +5,7 @@
 {% block content %}
 
 <!-- Div Topo - Tabela Machos e Femeas + Dropdown -->
+<!-- Top Div - Males and Females Table + Dropdown -->
 <div class="bg-white dark:bg-gray-900 shadow rounded-lg p-3 relative" style="margin-top: 20px;">
     <!-- Dropdown -->
     <div class="flex items-center justify-between mb-6">
@@ -146,7 +147,8 @@
     </form>
 </div>
 
-<!-- Div Baixo - Fertilização em massa -->
+<!-- Div Baixo - Fecundação em massa -->
+<!-- Bottom Div - Mass fertilization -->
 <div class="bg-white dark:bg-gray-900 shadow rounded-lg p-8 relative" style="margin-top: 20px;">
     <form action="/massfertilization" method="post" class="flex items-end gap-4"> 
         <input type="hidden" name="population_id" value="{{ population_id }}" />
@@ -174,6 +176,7 @@
     </form>
 </div>
 
+<!-- Modal para Fecundação Seletiva -->
 <!-- Modal para Selected Fertilization -->
 <div id="selected-fertilization-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-100 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-7xl max-h-full">
@@ -195,7 +198,6 @@
                     Select fishes to fertilize:
                 </p>
                 
-                {# Tabela de Indivíduos Selecionáveis #}
                 <form id="selected-fertilization-form" action="{{ url_for('api.selected_fertilization') }}" method="post">
                     <input type="hidden" name="population_id" value="{{ population_id }}">
                     <div class="flex flex-col md:flex-row gap-8 mt-6"> 
@@ -333,6 +335,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Função para exibir o ID do peixe selecionado
+        // Function to show the ID of the selected fish
         const displaySelectedFishId = (displayElementId, selectedId) => {
             const element = document.getElementById(displayElementId);
             if (element) {
@@ -340,7 +343,8 @@
             }
         };
 
-        // Lógica para as tabelas de fertilização simples (radio buttons)
+        // Lógica para as tabelas de fecundação simples (radio buttons)
+        // Logic for the simple fertilization tables (radio buttons)
         const femaleRadios = document.querySelectorAll('input[name="female_id"]');
         femaleRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
@@ -356,6 +360,7 @@
         });
 
         // Exibir o ID dos peixes selecionados ao carregar a página
+        // Show the ID of the selected fishes when loading the page
         const selectedFemale = document.querySelector('input[name="female_id"]:checked');
         if (selectedFemale) {
             displaySelectedFishId('female_id_display', selectedFemale.value);
@@ -365,54 +370,6 @@
         if (selectedMale) {
             displaySelectedFishId('male_id_display', selectedMale.value);
         }
-
-        // Lógica para o modal de Selected Fertilization (checkboxes)
-
-        // Selecionar/desselecionar todas as fêmeas
-        const selectAllFemales = document.getElementById('checkbox-female-fishes');
-        const femaleCheckboxes = document.querySelectorAll('#selected-fertilization-modal input[name="selected_female_fishes"]');
-        
-        if (selectAllFemales) {
-            selectAllFemales.addEventListener('change', function() {
-                femaleCheckboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
-                });
-            });
-        }
-        
-        // Desmarcar "selecionar todos" se uma fêmea for desmarcada
-        femaleCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                if (!this.checked) {
-                    if (selectAllFemales) {
-                        selectAllFemales.checked = false;
-                    }
-                }
-            });
-        });
-
-        // Selecionar/desselecionar todos os machos
-        const selectAllMales = document.getElementById('checkbox-male-fishes');
-        const maleCheckboxes = document.querySelectorAll('#selected-fertilization-modal input[name="selected_male_fishes"]');
-
-        if (selectAllMales) {
-            selectAllMales.addEventListener('change', function() {
-                maleCheckboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
-                });
-            });
-        }
-        
-        // Desmarcar "selecionar todos" se um macho for desmarcado
-        maleCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                if (!this.checked) {
-                    if (selectAllMales) {
-                        selectAllMales.checked = false;
-                    }
-                }
-            });
-        });
     });
 </script>
 {% endblock %}

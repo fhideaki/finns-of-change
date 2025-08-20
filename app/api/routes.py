@@ -116,9 +116,11 @@ def create_individuals():
             # Getting the forms data
             population_id = int(request.form['population_id'])
             # Quantidade de indivíduos que serão criados
+            # Amount of individuals that are going to be created
             quantity = int(request.form['quantity'])
 
             # Lista dos indivíduos criados
+            # Created individuals list
             created_individuals = []
 
             for i in range(quantity):
@@ -138,14 +140,16 @@ def create_individuals():
                 created_individuals.append(individual)
 
             # Adicionando uma mensagem de sucesso para o usuário
+            # Adding a success message for the user
             flash(f"{quantity} individual(s) created successfully for Population ID {population_id}", 'success')
 
             # Redirecionando para a página daquela população específica
+            # Redirecting for that specific population page
             return redirect(url_for('api.list', population_id=population_id))
     
         except KeyError as e:
             flash(f"Missing form data: {e}. Please ensure 'population_id' and 'quantity' are submitted.", 'error')
-            return redirect(request.referrer or url_for('api.index')) # Volta para a página anterior ou index
+            return redirect(request.referrer or url_for('api.index')) # Volta para a página anterior ou index/ Goes back to previous page or index page
         except ValueError:
             flash("Invalid input for population ID or quantity. Please provide valid numbers.", 'error')
             return redirect(request.referrer or url_for('api.index'))
@@ -155,7 +159,7 @@ def create_individuals():
         
     return redirect(url_for('api.index'))
 
-# Listando indivíduos
+# Listando indivíduos de uma população/ Listing individuals of a population
 @api.route('/list/<int:population_id>')
 def list_individuals(population_id):
 
@@ -179,19 +183,19 @@ def list_individuals(population_id):
                            population_name=population_name,
                            individuals_data=selected_individuals)
 
-# Listando todos os indivíduos
+# Listando todos os indivíduos/ Listing all individuals
 @api.route('/list')
 def list_all_individuals():
     result = get_all_individuals()
     return jsonify(result)
 
-# Buscando um indivíduo específico
+# Buscando um indivíduo específico/ Searching for a specific individual
 @api.route('/individual/<id>')
 def get_individual(id):
     result = get_individual_by_id(id)
     return jsonify(result)
 
-# Buscando as características do indivíduo
+# Buscando as características do indivíduo/ Getting individual characteristics
 @api.route('/individual/<id>/analysis')
 def get_analysis(id):
 
@@ -226,6 +230,7 @@ def get_analysis(id):
                            )
 
 # Função auxiliar para a árvore genealógica
+# Auxiliar function to family tree
 def get_family_tree(individual_id, depth=0, max_depth=3):
     
     if depth >= max_depth:
@@ -236,6 +241,7 @@ def get_family_tree(individual_id, depth=0, max_depth=3):
         return None
     
     # Montando o indivíduo
+    # Assembling the individual
     tree_node = {
         'id':individual['id'],
         'gender':individual['gender'],
@@ -245,12 +251,14 @@ def get_family_tree(individual_id, depth=0, max_depth=3):
     }
 
     # Buscando o pai e os pais dos pais e etc
+    # Searching for the father 
     if individual.get('father_id'):
         father_tree = get_family_tree(individual['father_id'], depth + 1, max_depth)
         if father_tree:
             tree_node['parents'].append(father_tree)
 
     # Buscando a mãe e as mães das mães e etc
+    # Searching for the mother
     if individual.get('mother_id'):
         mother_tree = get_family_tree(individual['mother_id'], depth + 1, max_depth)
         if father_tree:
@@ -258,16 +266,19 @@ def get_family_tree(individual_id, depth=0, max_depth=3):
 
     return tree_node
 
-# Rota para fertilizar
+# Rota para fecundar
+# Route to fertilize
 @api.route('/fertilize/<int:population_id>', methods=['GET', 'POST'])
 def fertilize(population_id):
     if request.method == 'GET':
         # Salvando todos os indivíduos
+        # Getting all individuals
         all_individuals = build_statistics_dataframe()
 
         individuals_data = []
 
         # Filtrando por população
+        # Filtering by population
         for i in all_individuals:
             if i['population_id'] == population_id:
                 individuals_data.append(i)
@@ -308,44 +319,45 @@ def fertilize(population_id):
 
         return redirect(url_for('api.fertilize', population_id=population_id))
 
-# Rota para fertilizar n vezes
+# Rota para fecundar n vezes
+# Route to fertilize n times
 @api.route('/massfertilization', methods=['POST'])
 def mass_fertilization():
     try:
         # Pegando os dados do formulário
+        # Getting form data
         population_id = int(request.form['population_id'])
 
         # Quantidade de indivíduos que serão criados
+        # Amount of individuals to be created
         quantity = int(request.form['quantity'])
 
         pop_mngr = PopulationManager()
 
-        created_individuals = []
-
         all_individuals = build_statistics_dataframe()
 
-        individuals_data = []
-        
         # Filtrando por população
-        for i in all_individuals:
-            if i['population_id'] == population_id:
-                individuals_data.append(i)
+        # Filtering by population
+        individuals_data = [i for i in all_individuals if i['population_id'] == population_id]
+
+        if len(individuals_data) < 2:
+            flash("É necessário pelo menos um macho e uma fêmea para a fertilização.", 'warning')
+            return redirect(request.referrer or url_for('api.index'))
             
         female_individuals = [i for i in individuals_data if i['gender'] == 'female']
         male_individuals = [i for i in individuals_data if i['gender'] == 'male']
 
         # Loop para fecundações
+        # Fertilization loop
         for i in range(quantity):
             mother = random.choice(female_individuals)
             father = random.choice(male_individuals)
 
             new_individual = pop_mngr.fertilization(father, mother)
-
             new_individual['population_id'] = population_id
-
             add_full_individual(new_individual, population_id)
-
-            created_individuals.append(new_individual)
+        
+        flash(f"Criação em massa de {quantity} peixes realizada com sucesso!", 'success')
         
         all_populations_data = get_populations()
 
@@ -353,12 +365,13 @@ def mass_fertilization():
             if pop['id'] == population_id:
                 population_name = pop['name']
 
-        return render_template('fertilize.html',
+        return redirect(url_for('fertilize.html',
                                female_individuals=female_individuals,
                                male_individuals=male_individuals,
                                population_id=population_id,
                                population_name=population_name,
-                               all_populations_data=all_populations_data)
+                               all_populations_data=all_populations_data))
+    
     except KeyError as e:
         flash(f"Missing form data: {e}. Please ensure 'population_id' and 'quantity' are submitted.", 'error')
         return redirect(request.referrer or url_for('api.index')) # Volta para a página anterior ou index
@@ -369,22 +382,27 @@ def mass_fertilization():
         flash(f"An error occurred during individual creation: {e}", 'error')
         return redirect(request.referrer or url_for('api.index'))
             
-# Rota para fertilizar n vezes
+# Rota para fecundação seletiva
+# Route to selective fertilization
 @api.route('/selectedfertilization', methods=['POST'])
 def selected_fertilization():
     try:
         if request.method == 'POST':
             # Pegando os dados do formulário
+            # Getting form data
             population_id = int(request.form['population_id'])
 
             # Quantidade de indivíduos que serão criados
+            # Amount of individuals to be created
             quantity = int(request.form['quantity'])
 
             # Pegando os IDs dos peixes selecionados
+            # Getting the IDs of selected fishes
             selected_female_ids = request.form.getlist('selected_female_fishes[]')
             selected_male_ids = request.form.getlist('selected_male_fishes[]')
 
             # Verificando se pelo menos um peixe de cada gênero foi selecionado
+            # Checking if at least one fish of each gender was selected
             if not selected_female_ids or not selected_male_ids:
                 flash("Please, select at least one female and one male fish for the selected fecundation.", 'error')
                 return redirect(request.referrer or url_for('api.index'))
@@ -407,6 +425,7 @@ def selected_fertilization():
             pop_mngr = PopulationManager()
             
             # Loop para fecundações
+            # Fertilization loop
             for i in range(quantity):
                 mother = random.choice(selected_females)
                 father = random.choice(selected_males)
@@ -438,12 +457,12 @@ def selected_fertilization():
                 if pop['id'] == population_id:
                     population_name = pop['name']
 
-            return render_template('fertilize.html',
+            return redirect(url_for('fertilize.html',
                                 female_individuals=female_individuals,
                                 male_individuals=male_individuals,
                                 population_id=population_id,
                                 population_name=population_name,
-                                all_populations_data=all_populations_data)
+                                all_populations_data=all_populations_data))
     
     except KeyError as e:
         flash(f"Missing form data: {e}. Please ensure 'population_id' and 'quantity' are submitted.", 'error')
@@ -456,6 +475,7 @@ def selected_fertilization():
         return redirect(request.referrer or url_for('api.index'))
             
 # Criando populações
+# Creating populations
 @api.route('/populations', methods=['GET','POST'])
 def population_route():
 
@@ -469,6 +489,7 @@ def population_route():
         return redirect('/populations')
 
 # Retornando um JSON com todas as estatísticas dos peixes criados
+# Returning a JSON type file with all of the fishes data
 @api.route('/statistics')
 def get_statistics_dataframe():
 
@@ -477,6 +498,7 @@ def get_statistics_dataframe():
     return jsonify(indviduals_dict)
 
 # Deletando um indivíduo
+# Deleting an individual
 @api.route('/delete/<id>', methods=['POST'])
 def delete_individual_route(id):
     
@@ -485,16 +507,18 @@ def delete_individual_route(id):
     return redirect(request.referrer or url_for('api.index'))
 
 # Deletando vários indivíduos
+# Deleting multiple individuals
 @api.route('/delete_individuals', methods=['POST'])
 def delete_individuals_route():
 
-    individuals_to_delete = request.args.getlist('selected_fishes')
+    individuals_to_delete = request.form.getlist('selected_fishes')
     for i in individuals_to_delete:
         delete_individual(i)
 
     return redirect(request.referrer or url_for('api.index'))
 
 # Deletando uma população
+# Deleting a population
 @api.route('/delete/population/<population_id>', methods=['POST'])
 def delete_population_route(population_id):
     
@@ -503,12 +527,15 @@ def delete_population_route(population_id):
     return redirect('/populations')
 
 # Exportando JSON
+# Exporting JSON
 @api.route('/export_json', methods=['GET'])
 def export_json():
     # Recebendo os IDs das populações selecionadas
+    # Getting the IDs of the selected populations
     selected_population_ids_str = request.args.getlist('selected_populations')
 
     # Convertendo para inteiros
+    # Converting to int
     selected_population_ids = [int(pop_id) for pop_id in selected_population_ids_str if pop_id.isdigit()]
 
     if not selected_population_ids:
@@ -526,9 +553,10 @@ def export_json():
     buffer.seek(0)
 
     # Enviando o arquivo JSON para o navegador
+    # Sending the JSON type file to the browser
     return send_file(
         buffer,
         mimetype='application/json',
         as_attachment=True,
-        download_name='finns_of_change_export.json'
+        attachment_filename='finns_of_change_export.json'
     )

@@ -1,7 +1,7 @@
-
 from app.utils.support import inverted_aminoacid_table
 
 # Classe GeneReader, que vai receber o DNA e exibir as características de acordo com os genes gerados.
+# GeneReader Class. It will receive the DNA and show the characteristics based on the generated genes.
 class GeneReader():
     
     def __init__(self, individual_dictionary):
@@ -33,10 +33,13 @@ class GeneReader():
         return aminoacids
     
     # Agora consigo analisar cada par de cromossomos.
+    # Now I can analye each chromosome pair
     def get_color(self, aminoacids):
         
     # Vou definir arbitrariamente que o primeiro par define a cor.
+    # Arbitrarily setting the color as defined by the first pair
     # A cor geralmente é definida pela quantidade de melanina, que é sintetizada pela tirosina (tyrosine)
+    # Color is usually defined by the amount of melanin, synthesized by tyrosine
         color_chromosomes = aminoacids[0] + aminoacids[1]
         color_gene = {x: color_chromosomes.count(x) for x in set(color_chromosomes)}
 
@@ -56,6 +59,7 @@ class GeneReader():
     
     def get_swimming_speed(self, aminoacids):
     # Definindo arbitrariamente que a velocidade de nado está associada com o segundo par de cromossomos.
+    # Arbitrarily setting swimming speed based on the second pair of chromosomes
         swim_chromosomes = aminoacids[2] + aminoacids[3]
         swim_gene = {x: swim_chromosomes.count(x) for x in set(swim_chromosomes)}
         self.swimming_speed = 1 * (swim_gene.get('arginine',0) * 5) - swim_gene.get('stop',0)
@@ -64,6 +68,7 @@ class GeneReader():
     
     def get_gender(self, aminoacids, index=5):
     # Definindo arbitrariamente o gênero do peixe
+    # Arbitrarily defining the fish gender
         gender_chromosomes = aminoacids[index]
         gender_gene = {x: gender_chromosomes.count(x) for x in set(gender_chromosomes)}
         glutamine = gender_gene.get('glutamine',0)
