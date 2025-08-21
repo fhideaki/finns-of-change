@@ -64,30 +64,17 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Obter o elemento para exibir a cor
-        // Get the element to show the color
+
         const fishColorDisplay = document.getElementById('fishColorDisplay');
-        const fishColor = "{{ color }}";
+        let fishColor = "{{ color }}";
+
+        if (fishColor.match(/^[0-9A-F]{6}$/i)) {
+            fishColor = '#' + fishColor;
+        }
+        
         if (fishColorDisplay && fishColor) {
             fishColorDisplay.style.backgroundColor = fishColor;
         }
-
-        const familyTreeData = {{ family_tree_data | tojson | safe }};
-
-        const createFishNode = (fish) => {
-            const node = document.createElement('div');
-            node.className = "flex flex-col items-center p-2 rounded-lg shadow dark:bg-gray-800";
-            
-            const isLink = fish.id != "{{ fish_id }}";
-            
-            if (isLink) {
-                node.innerHTML = `<a href="/individual/${fish.id}/analysis" class="font-bold text-blue-600 dark:text-blue-400 hover:underline">ID: ${fish.id}</a>`;
-            } else {
-                node.innerHTML = `<p class="font-bold text-gray-800 dark:text-white">ID: ${fish.id}</p>`;
-            }
-            
-            return node;
-        };
 
         const renderTree = (node, parentElement) => {
             if (!node || !parentElement) {

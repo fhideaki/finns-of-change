@@ -199,32 +199,47 @@ def get_individual(id):
 @api.route('/individual/<id>/analysis')
 def get_analysis(id):
 
-    fish = get_individual_by_id(id)
     family_tree = get_family_tree(id, max_depth=3)
-    fish_karyo = get_karyotype_by_id(id)
     fish_char = get_individual_characteristics(id)
 
-    populations_list = get_populations()
+    individuals = build_statistics_dataframe()
 
-    for i in populations_list:
-        if i['id'] == fish['population_id']:
-            population_name = i['name']
+    for ind in individuals:
+        if ind['id'] == id:
+            father_id = ind.get('father_id')
+            mother_id = ind.get('mother_id')
+            generation = ind.get('generation')
+            gender = ind.get('gender')
+            timestamp = ind.get('timestamp')
+            population_id = ind.get('population_id')
+            population_name = ind.get('population_name')
+            karyotype = ind.get('karyotype')
+            chromosome_origin_father = ind.get('chromosome_origin_father')
+            chromosome_origin_mother = ind.get('chromosome_origin_mother')
+            cutting_points_father = ind.get('cutting_points_father')
+            cutting_points_mother = ind.get('cutting_points_mother')
+            swimming_speed = ind.get('swimming_speed')
+            method = ind.get('method')
+            color = ind.get('color')
+            break
 
     return render_template('fish.html',
                            fish_id=id,
-                           father_id=fish['father_id'],
-                           mother_id=fish['mother_id'],
-                           generation=fish['generation'],
-                           gender=fish['gender'],
-                           timestamp=fish['timestamp'],
-                           population_id=fish['population_id'],
+                           father_id=father_id,
+                           mother_id=mother_id,
+                           generation=generation,
+                           gender=gender,
+                           timestamp=timestamp,
+                           population_id=population_id,
                            population_name=population_name,
-                           karyotype=fish_karyo['karyotype'],
-                           chromosome_origin=fish_karyo['chromosome_origin'],
-                           cutting_points=fish_karyo['cutting_points'],
-                           method=fish_karyo['method'],
-                           color=fish_char['color'],
-                           swimming_speed=fish_char['swimming_speed'],
+                           karyotype=karyotype,
+                           chromosome_origin_father = chromosome_origin_father,
+                           chromosome_origin_mother = chromosome_origin_mother,
+                           cutting_points_father = cutting_points_father,
+                           cutting_points_mother = cutting_points_mother,
+                           swimming_speed = swimming_speed,
+                           method = method,
+                           color = color,
                            genes=fish_char['genes'],
                            family_tree_data=family_tree
                            )

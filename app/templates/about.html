@@ -116,11 +116,9 @@
                     <th scope="col" class="px-6 py-3">
                         Mother ID
                     </th>
-                    <th scope="col" class="px-6 py-3">
-                        Actions
-                        <span class="sr-only display-flex gap-2">View</span>
-                        <span class="sr-only display-flex gap-2">Delete</span>
-                    </th>
+                    {# <th scope="col" class="px-6 py-3">
+                        <span class="sr-only">Actions</span>
+                    </th> #}
                 </tr>
             </thead>
             <tbody>
@@ -150,14 +148,10 @@
                     <td class="px-6 py-4">
                         {{ individual.mother_id if individual.mother_id is not none else '-' }} {# Exibe '-' se não houver mãe #}
                     </td>
-                    <td class="px-6 py-4 text-right">
-                        <div>
-                            <a href="{{ url_for('api.get_analysis', id=individual.id, population_id=population_id, population_name=population_name) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</a>
-                            <form method="POST" action="/delete/{{ individual.id }}" onsubmit="return confirmDelete()">
-                                <button type="submit" class="font-medium text-blue-600 dark:text-red-500 hover:underline">Delete</button>
-                            </form>
-                        </div>
-                    </td>
+                    {# Exemplo de coluna de ação #}
+                    {# <td class="px-6 py-4 text-right">
+                        <a href="{{ url_for('api.individual_details', id=individual.id) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</a>
+                    </td> #}
                 </tr>
                 {% else %}
                 <!-- Mensagem caso não haja indivíduos para a população selecionada -->
