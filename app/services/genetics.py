@@ -37,7 +37,7 @@ class Nucleus():
         self.chromosome_pairs = list(zip(karyotype[::2],karyotype[1::2]))
         return self.chromosome_pairs
     
-    def __crossing_over(self, chromosome_pair, cutting_point):
+    def __crossing_over(self, chromosome_pair, cutting_point=0):
         new_chromosome = [ x for x in chromosome_pair[0][0:cutting_point] + chromosome_pair[1][cutting_point:]]
         return new_chromosome
     
